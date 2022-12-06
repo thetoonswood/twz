@@ -32,7 +32,59 @@ LOGGER = getLogger(__name__)
 
 TIME_GAP_STORE = {}
 
+CONFIG_FILE_URL = environ.get('CONFIG_FILE_URL')
+try:
+    if len(CONFIG_FILE_URL) == 0:
+        raise TypeError
+    try:
+        res = rget(CONFIG_FILE_URL)
+        if res.status_code == 200:
+            with open('config.env', 'wb+') as f:
+                f.write(res.content)
+        else:
+            log_error(f"Failed to download config.env {res.status_code}")
+    except Exception as e:
+        log_error(f"CONFIG_FILE_URL: {e}")
+except:
+    pass
+
 load_dotenv('config.env', override=True)
+
+try:
+    TOKEN_PICKLE_URL = getConfig('TOKEN_PICKLE_URL')
+    if len(TOKEN_PICKLE_URL) == 0:
+        raise KeyError
+    try:
+        res = rget(TOKEN_PICKLE_URL)
+        if res.status_code == 200:
+            with open('token.pickle', 'wb+') as f:
+                f.write(res.content)
+        else:
+            log_error(f"Failed to download token.pickle, link got HTTP response: {res.status_code}")
+    except Exception as e:
+        log_error(f"TOKEN_PICKLE_URL: {e}")
+except:
+    pass
+  
+try:
+    ACCOUNTS_ZIP_URL = getConfig('ACCOUNTS_ZIP_URL')
+    if len(ACCOUNTS_ZIP_URL) == 0:
+        raise KeyError
+    try:
+        res = rget(ACCOUNTS_ZIP_URL)
+        if res.status_code == 200:
+            with open('accounts.zip', 'wb+') as f:
+                f.write(res.content)
+        else:
+            log_error(f"Failed to download accounts.zip, link got HTTP response: {res.status_code}")
+    except Exception as e:
+        log_error(f"ACCOUNTS_ZIP_URL: {e}")
+        raise KeyError
+    srun(["unzip", "-q", "-o", "accounts.zip"])
+    srun(["chmod", "-R", "777", "accounts"])
+    osremove("accounts.zip")
+except:
+    pass
 
 Interval = []
 QbInterval = []
@@ -446,13 +498,13 @@ START_BTN1_NAME = environ.get('START_BTN1_NAME', '')
 START_BTN1_URL = environ.get('START_BTN1_URL', '')
 if len(START_BTN1_NAME) == 0 or len(START_BTN1_URL) == 0:
     START_BTN1_NAME = 'Master'
-    START_BTN1_URL = 'https://t.me/krn_adhikari'
+    START_BTN1_URL = 'https://t.me/toonshub2006'
 
 START_BTN2_NAME = environ.get('START_BTN2_NAME', '')
 START_BTN2_URL = environ.get('START_BTN2_URL', '')
 if len(START_BTN2_NAME) == 0 or len(START_BTN2_URL) == 0:
     START_BTN2_NAME = 'Support Group'
-    START_BTN2_URL = 'https://t.me/WeebZone_updates'
+    START_BTN2_URL = 'https://t.me/toonshub_updates'
 
 BUTTON_FOUR_NAME = environ.get('BUTTON_FOUR_NAME', '')
 BUTTON_FOUR_URL = environ.get('BUTTON_FOUR_URL', '')
@@ -534,19 +586,19 @@ if len(AUTHOR_NAME) == 0:
 
 AUTHOR_URL = environ.get('AUTHOR_URL', '')
 if len(AUTHOR_URL) == 0:
-    AUTHOR_URL = 'https://t.me/WeebZone_updates'
+    AUTHOR_URL = 'https://t.me/toonshub_updates'
 
 TITLE_NAME = environ.get('TITLE_NAME', '')
 if len(TITLE_NAME) == 0:
-    TITLE_NAME = 'WeebZone'
+    TITLE_NAME = 'ToonsHub'
 
 GD_INFO = environ.get('GD_INFO', '')
 if len(GD_INFO) == 0:
-    GD_INFO = 'Uploaded by WeebZone Mirror Bot'
+    GD_INFO = 'Uploaded by ToonsHub Mirror Bot'
 
 CREDIT_NAME = environ.get('CREDIT_NAME', '')
 if len(CREDIT_NAME) == 0:
-    CREDIT_NAME = 'WeebZone'
+    CREDIT_NAME = 'ToonsHub'
 
 NAME_FONT = environ.get('NAME_FONT', '')
 if len(NAME_FONT) == 0:
@@ -571,7 +623,7 @@ if len(MULTI_WORKING_PROGRESS_STR) != 7:
 
 CHANNEL_USERNAME = environ.get('CHANNEL_USERNAME', '')
 if len(CHANNEL_USERNAME) == 0:
-    CHANNEL_USERNAME = 'WeebZone_updates'
+    CHANNEL_USERNAME = 'ToonsHub_updates'
 
 FSUB_CHANNEL_ID = environ.get('FSUB_CHANNEL_ID', '')
 if len(FSUB_CHANNEL_ID) == 0:
@@ -821,33 +873,4 @@ sleep(1.5)
 
 aria2c_global = ['bt-max-open-files', 'download-result', 'keep-unfinished-download-result', 'log', 'log-level',
                  'max-concurrent-downloads', 'max-download-result', 'max-overall-download-limit', 'save-session',
-                 'max-overall-upload-limit', 'optimize-concurrent-downloads', 'save-cookies', 'server-stat-of']
-
-if not aria2_options:
-    aria2_options = aria2.client.get_global_option()
-    del aria2_options['dir']
-else:
-    a2c_glo = {}
-    for op in aria2c_global:
-        if op in aria2_options:
-            a2c_glo[op] = aria2_options[op]
-    aria2.set_global_options(a2c_glo)
-
-qb_client = get_client()
-if not qbit_options:
-    qbit_options = dict(qb_client.app_preferences())
-    del qbit_options['listen_port']
-    for k in list(qbit_options.keys()):
-        if k.startswith('rss'):
-            del qbit_options[k]
-else:
-    qb_opt = {**qbit_options}
-    for k, v in list(qb_opt.items()):
-        if v in ["", "*"]:
-            del qb_opt[k]
-    qb_client.app_set_preferences(qb_opt)
-
-updater = tgUpdater(token=BOT_TOKEN, request_kwargs={'read_timeout': 20, 'connect_timeout': 15})
-bot = updater.bot
-dispatcher = updater.dispatcher
-job_queue = updater.job_queue
+                 'max-overall-upload-limit', 'optimize-concurrent-downloads', 'save-cookies', '
